@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset='utf-8' />
+    <title>Swipe between maps</title>
+    <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
+    <script src='https://api.tiles.mapbox.com/mapbox-gl-js/v0.42.2/mapbox-gl.js'></script>
+    <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v0.42.2/mapbox-gl.css' rel='stylesheet' />
+    <style>
+        body { margin:0; padding:0; }
+        #map { position:absolute; top:0; bottom:0; width:100%; }
+    </style>
+    <script src='https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-compare/v0.1.0/mapbox-gl-compare.js'></script>
+    <link rel='stylesheet' href='https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-compare/v0.1.0/mapbox-gl-compare.css' type='text/css' />
+    <script
+      src="https://code.jquery.com/jquery-3.2.1.min.js"
+      integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4="
+      crossorigin="anonymous"></script>
+
+      <link href="https://api.mapbox.com/mapbox-assembly/v0.20.0/assembly.min.css" rel="stylesheet">
+
+</head>
+<body>
+
+<style>
+body {
+    overflow: hidden;
+}
+
+body * {
+   -webkit-touch-callout: none;
+     -webkit-user-select: none;
+        -moz-user-select: none;
+         -ms-user-select: none;
+             user-select: none;
+}
+
+.map {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 100%;
+}
+</style>
+
+<div class='dropdownMenu z2 absolute top left bg-white round px24 py24'>
+    <p class='txt txt-light'>Site:  </p>
+  <div class='select-container'>
+    <select id='siteSelect1' class='select select--stroke'>
+      <option value='Pasadena'>Pasadena</option>
+      <option value='Homeboy'>Homeboy</option>
+    </select>
+    <div class='select-arrow'></div>
+</div>
+  <p class='txt txt-light'>Year  </p>
+<div class='select-container'>
+    <select id='yearSelect1' class='select select--stroke'>
+      <option value='2008-09'>2008</option>
+      <option value='2009-10'>2009</option>
+      <option value='2010-11'>2010</option>
+      <option value='2011-12'>2011</option>
+      <option value='2012-13'>2012</option>
+      <option value='2013-14'>2013</option>
+      <option value='2014-15'>2014</option>
+      <option value='2015-16'>2015</option>
+      <option value='2016-17'>2016</option>
+      <option value='2017-18'>2017</option>
+    </select>
+    <div class='select-arrow'></div>
+  </div>
+</div>
+
+<div class='dropdownMenu z2 absolute top right bg-white round px24 py24'>
+  <p class='txt txt-light'>Site:  </p>
+  <div class='select-container'>
+    <select id='siteSelect2' class='select select--stroke'>
+      <option value='Pasadena'>Pasadena</option>
+      <option value='Homeboy'>Homeboy</option>
+    </select>
+    <div class='select-arrow'></div>
+  </div>
+  <p class='txt txt-light'>Year  </p>
+  <div class='select-container'>
+    <select id='yearSelect2' class='select select--stroke'>
+      <option value='2008-09'>2008</option>
+      <option value='2009-10'>2009</option>
+      <option value='2010-11'>2010</option>
+      <option value='2011-12'>2011</option>
+      <option value='2012-13'>2012</option>
+      <option value='2013-14'>2013</option>
+      <option value='2014-15'>2014</option>
+      <option value='2015-16'>2015</option>
+      <option value='2016-17'>2016</option>
+      <option value='2017-18'>2017</option>
+    </select>
+    <div class='select-arrow'></div>
+  </div>
+</div>
+
+
+<div id='before' class='map'></div>
+<div id='after' class='map'></div>
+<script>
+mapboxgl.accessToken = 'pk.eyJ1Ijoic2NvdHRzZmFybGV5OTMiLCJhIjoiY2o4ODJxNjh4MWVndjJ3cWI5ODRlZ2hnayJ9.w9-dF3jh-GtQzk9h0wBUbw';
+
+var targetLayer = "zipcodes";
+var center = [-118.066,34.06];
+var zoom = 9;
+
+var beforeMap = new mapboxgl.Map({
+    container: 'before',
+    style: 'mapbox://styles/scottsfarley93/cjbbmpd7d689q2sqnpcakx2tq/draft?fresh=true',
+    center: center,
+    zoom: zoom
+});
+
+var afterMap = new mapboxgl.Map({
+    container: 'after',
+    style: 'mapbox://styles/scottsfarley93/cjbbmpd7d689q2sqnpcakx2tq/draft?fresh=true',
+    center: center,
+    zoom: zoom
+});
+
+var map = new mapboxgl.Compare(beforeMap, afterMap, {
+    // Set this to enable comparing two maps by mouse movement:
+    // mousemove: true
+});
+
+function updateMapLayer(mapID){
+  let site = getSiteFromMapID(mapID);
+  let year = getYearFromMapID(mapID);
+  let map = getMapFromID(mapID);
+  console.log("site:", site);
+  console.log("year:",year);
+
+  map.setFilter(targetLayer, ["all", ["==", "site", site], ['==', 'year', year]]);
+}
+
+function getMapFromID(mapID){
+  if (mapID == 1){
+    return beforeMap
+  }else{
+    return afterMap;
+  }
+}
+
+function getSiteFromMapID(mapID){
+  let key;
+  if (mapID == 1){
+    key = "#siteSelect1"
+  }else{
+    key = "#siteSelect2"
+  }
+  let site = $(key).val();
+  return site;
+}
+
+function getYearFromMapID(mapID){
+  let key;
+  if (mapID == 1){
+    key = "#yearSelect1"
+  }else{
+    key = "#yearSelect2"
+  }
+  let year = $(key).val();
+  return year;
+}
+
+
+function getPopupContents(feature, mapID){
+  let site = getSiteFromMapID(mapID);
+  let year = getYearFromMapID(mapID);
+  let value = feature.properties.value;
+  let noun;
+  if (value == 1){
+    noun =  "student"
+  }else{
+    noun = "students"
+  }
+  let html = `<h4 class="txt txt-h4">${feature.properties.zip}</h4>`;
+  html += `<p class="txt"><b>${value} ${noun}</b> at ${site} in ${year}</p>`;
+  return html
+}
+
+const layerFillStyles = {
+  'property': 'normValue',
+  'default': 'rgba(0, 0, 0, 1)',
+  'stops': [
+    [0, '#edf8fb'],
+    [8e-8, '#b3cde3'],
+    [8e-7, '#8c96c6'],
+    [8e-6, '#8856a7'],
+    [8e-5, '#4d004b']
+  ]
+}
+
+
+$(document).ready(function(){
+  $("#yearSelect1").on('change', function(){
+    updateMapLayer(1);
+  })
+  $("#yearSelect2").on('change', function(){
+    updateMapLayer(2);
+  })
+
+  $("#siteSelect1").on('change', function(){
+    updateMapLayer(1);
+  })
+  $("#siteSelect2").on('change', function(){
+    updateMapLayer(2);
+  })
+
+  beforeMap.on('load', function(){
+     beforeMap.setFilter(targetLayer, ["all", ["==", "site", "Pasadena"], ['==', 'year', "2008-09"]]);
+     beforeMap.setPaintProperty(targetLayer, 'fill-color', layerFillStyles);
+     beforeMap.on('mouseenter', targetLayer, function () {
+         beforeMap.getCanvas().style.cursor = 'pointer';
+     });
+     beforeMap.on('mouseleave', targetLayer, function () {
+         beforeMap.getCanvas().style.cursor = '';
+     });
+     beforeMap.on('click', targetLayer, function (e) {
+           new mapboxgl.Popup()
+               .setLngLat(e.lngLat)
+               .setHTML(getPopupContents(e.features[0], 1))
+               .addTo(beforeMap);
+       });
+  });
+
+  afterMap.on('load', function(){
+    afterMap.setFilter(targetLayer, ["all", ["==", "site", "Pasadena"], ['==', 'year', "2017-18"]]);
+    afterMap.setPaintProperty(targetLayer, 'fill-color', layerFillStyles)
+    afterMap.on('mouseenter', targetLayer, function () {
+       afterMap.getCanvas().style.cursor = 'pointer';
+    });
+    afterMap.on('mouseleave', targetLayer, function () {
+       afterMap.getCanvas().style.cursor = '';
+    });
+    afterMap.on('click', targetLayer, function (e) {
+          new mapboxgl.Popup()
+               .setLngLat(e.lngLat)
+               .setHTML(getPopupContents(e.features[0], 2))
+              .addTo(afterMap);
+      });
+  })
+
+   $("#yearSelect2").val('2017-18');
+
+
+
+})
+
+</script>
+
+</body>
+</html>
