@@ -1,8 +1,8 @@
 from area import area
 import json
 
-source = "/Users/scottfarley/Documents/scratch/joined.geojson"
-target = open("/Users/scottfarley/Documents/pasadena/joined.geojson", 'w')
+source = "/Users/scottfarley/Documents/scratch/lwsc_with_combined.json"
+target = open("/Users/scottfarley/Documents/lwcs/joined.geojson", 'w')
 
 for line in open(source, 'r'):
     feature = json.loads(line)
